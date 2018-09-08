@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./openzeppelin/SignatureBouncer.sol";
 import "./SignerWithDeadSwitch.sol";
 
+// Inspired by https://github.com/austintgriffith/bouncer-proxy/blob/master/BouncerProxy/BouncerProxy.sol
 contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
 
   constructor(address _signer) public {
@@ -12,7 +13,6 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
   // to avoid replay and to enfore tx order
   uint public nonce;
 
-  // copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
   function () public payable {
       emit Received(msg.sender, msg.value);
   }
@@ -20,31 +20,21 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
   event Received (address indexed sender, uint value);
 
   // original forward function copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
-  function forward(bytes sig, address signer, address destination, uint value, bytes data, address rewardToken, uint rewardAmount) public {
+  function forward(bytes sig, address signer, address destination, uint value, bytes data) public {
       //the hash contains all of the information about the meta transaction to be called
-      bytes32 _hash = keccak256(abi.encodePacked(address(this), signer, destination, value, data, rewardToken, rewardAmount, nonce));
+      bytes32 _hash = keccak256(abi.encodePacked(address(this), signer, destination, value, data, nonce));
       nonce++;
 
       //this makes sure signer signed correctly AND signer is a valid bouncer
       require(_isValidDataHash(_hash,sig));
-      //make sure the signer pays in whatever token (or ether) the sender and signer agreed to
-      // or skip this if the sender is incentivized in other ways and there is no need for a token
-      if(rewardToken==address(0)){
-        //ignore reward, 0 means none
-      }else if(rewardToken==address(1)){
-        //REWARD ETHER
-        require(msg.sender.call.value(rewardAmount).gas(36000)());
-      }else{
-        //REWARD TOKEN
-        require((StandardToken(rewardToken)).transfer(msg.sender,rewardAmount));
-      }
+
       //execute the transaction with all the given parameters
       require(executeCall(destination, value, data));
-      emit Forwarded(sig, signer, destination, value, data, rewardToken, rewardAmount, _hash);
+      emit Forwarded(sig, signer, destination, value, data, _hash);
   }
 
   // when some frontends see that a tx is made from a bouncerproxy, they may want to parse through these events to find out who the signer was etc
-  event Forwarded (bytes sig, address signer, address destination, uint value, bytes data,address rewardToken, uint rewardAmount,bytes32 _hash);
+  event Forwarded (bytes sig, address signer, address destination, uint value, bytes data, bytes32 _hash);
 
   // copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
   // which was copied from GnosisSafe
