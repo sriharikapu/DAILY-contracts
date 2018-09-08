@@ -13,7 +13,7 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
   mapping(address => uint) public nonce;
 
   // copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
-  function () payable {
+  function () public payable {
       emit Received(msg.sender, msg.value);
   }
 
@@ -54,6 +54,6 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
   }
 }
 
-contract StandardToken {
-  function transfer(address _to,uint256 _value) public returns (bool) { }
+interface StandardToken {
+  function transfer(address _to,uint256 _value) external returns (bool);
 }
