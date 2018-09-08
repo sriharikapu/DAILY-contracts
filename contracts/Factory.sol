@@ -8,13 +8,13 @@ contract Factory is CloneFactory {
 
     address public libraryAddress;
 
-    event Created(address newThingAddress);
+    event Created(address newProxyAddress);
 
     constructor() public {
         libraryAddress = new BouncerProxy();
     }
 
-    function createThing(address _signer, address _recoverer) public {
+    function createProxy(address _signer, address _recoverer) public {
         address clone = createClone(libraryAddress);
         BouncerProxy(clone).init(_signer, _recoverer);
         emit Created(clone);
