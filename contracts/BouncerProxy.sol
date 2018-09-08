@@ -6,8 +6,8 @@ import "./SignerWithDeadSwitch.sol";
 // Inspired by https://github.com/austintgriffith/bouncer-proxy/blob/master/BouncerProxy/BouncerProxy.sol
 contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
 
-  constructor(address _signer) public {
-      _addSigner(_signer);
+  constructor(address signer) public {
+      _addSigner(signer);
   }
 
   // to avoid replay and to enfore tx order
