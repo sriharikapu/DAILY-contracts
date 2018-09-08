@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
-import "openzeppelin/SignerRole.sol";
-import "openzeppelin/ECDSA.sol";
+import "./openzeppelin/SignerRole.sol";
+import "./openzeppelin/ECDSA.sol";
 
 contract SignerWithDeadSwitch is SignerRole {
     using ECDSA for bytes32;
@@ -15,7 +15,6 @@ contract SignerWithDeadSwitch is SignerRole {
 
     function initiateDeadSwitch(uint _finalizeAfter, bytes _recovererSig) public {
         require(_finalizeAfter > now + 6 * 30 days);
-        // require(recoverer == recover(keccak256(_finalizeAfter), _recovererSig));
         require(recoverer == keccak256(abi.encodePacked(_finalizeAfter)).recover(_recovererSig));
         finalizeAfter = _finalizeAfter;
     }
@@ -25,7 +24,6 @@ contract SignerWithDeadSwitch is SignerRole {
         require(now > finalizeAfter);
 
         require(recoverer == keccak256(abi.encodePacked(_newSigner, finalizeAfter)).recover(_recovererSig));
-        // require(recoverer == recover(keccak256(_newSigner, finalizeAfter), _recovererSig));
         _addSigner(_newSigner);
         finalizeAfter = 0;
     }

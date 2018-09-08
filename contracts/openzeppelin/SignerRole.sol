@@ -11,7 +11,8 @@ contract SignerRole {
   Roles.Role private signers;
 
   constructor() public {
-    signers.add(msg.sender);
+    //NOTE: _addSigner() must be used manually in the child constructor
+    //signers.add(msg.sender);
   }
 
   modifier onlySigner() {
