@@ -9,8 +9,8 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
       _addSigner(_signer);
   }
 
-  //to avoid replay
-  mapping(address => uint) public nonce;
+  // to avoid replay and to enfore tx order
+  uint public nonce;
 
   // copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
   function () public payable {
@@ -22,7 +22,9 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
   // original forward function copied from https://github.com/uport-project/uport-identity/blob/develop/contracts/Proxy.sol
   function forward(bytes sig, address signer, address destination, uint value, bytes data, address rewardToken, uint rewardAmount) public {
       //the hash contains all of the information about the meta transaction to be called
-      bytes32 _hash = keccak256(abi.encodePacked(address(this), signer, destination, value, data, rewardToken, rewardAmount, nonce[signer]++));
+      bytes32 _hash = keccak256(abi.encodePacked(address(this), signer, destination, value, data, rewardToken, rewardAmount, nonce));
+      nonce++;
+
       //this makes sure signer signed correctly AND signer is a valid bouncer
       require(_isValidDataHash(_hash,sig));
       //make sure the signer pays in whatever token (or ether) the sender and signer agreed to
