@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
-import "SignerRole.sol";
-import "ECDSA.sol";
+import "./SignerRole.sol";
+import "./ECDSA.sol";
 
 
 /**

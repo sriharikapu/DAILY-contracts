@@ -15,7 +15,7 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
       //the hash contains all of the information about the meta transaction to be called
       bytes32 _hash = keccak256(abi.encodePacked(address(this), signer, destination, value, data, rewardToken, rewardAmount, nonce[signer]++));
       //this makes sure signer signed correctly AND signer is a valid bouncer
-      require(isValidDataHash(_hash,sig));
+      require(_isValidDataHash(_hash,sig));
       //make sure the signer pays in whatever token (or ether) the sender and signer agreed to
       // or skip this if the sender is incentivized in other ways and there is no need for a token
       if(rewardToken==address(0)){
