@@ -9,7 +9,13 @@ contract SignerWithDeadSwitch is SignerRole {
     address private recoverer;
     uint    private finalizeAfter;
 
-    constructor(address _recoverer) public {
+    function _recovererInitialized() internal view returns (bool) {
+        return recoverer != address(0);
+    }
+
+    function _initRecoverer(address _recoverer) internal {
+        require(recoverer == address(0));
+        require(!_recovererInitialized());
         recoverer = _recoverer;
     }
 
@@ -32,6 +38,7 @@ contract SignerWithDeadSwitch is SignerRole {
     // NOTE: to be called by the contract itself!
     function changeRecoverer(address _newRecoverer) public {
         require(msg.sender == address(this));
+        require(_newRecoverer != address(0)); // to not mess with initialization
         require(_newRecoverer != recoverer); // to avoid malicious initiateDeadSwitch() calls via sig replay
         recoverer = _newRecoverer;
         finalizeAfter = 0;

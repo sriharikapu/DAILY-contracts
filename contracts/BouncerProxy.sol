@@ -6,9 +6,10 @@ import "./SignerWithDeadSwitch.sol";
 // Inspired by https://github.com/austintgriffith/bouncer-proxy/blob/master/BouncerProxy/BouncerProxy.sol
 contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
 
-  constructor(address signer, address recoverer) public {
-      SignerWithDeadSwitch(recoverer);
-      _addSigner(signer);
+  function init(address _signer, address _recoverer) public {
+      require(_recovererInitialized() == false);
+      _initRecoverer(_recoverer); // this will fail on subsequent calls
+      _addSigner(_signer);
   }
 
   // to avoid replay and to enfore tx order
