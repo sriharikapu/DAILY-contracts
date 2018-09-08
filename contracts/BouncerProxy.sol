@@ -45,7 +45,3 @@ contract BouncerProxy is SignatureBouncer, SignerWithDeadSwitch {
     }
   }
 }
-
-interface StandardToken {
-  function transfer(address _to,uint256 _value) external returns (bool);
-}
