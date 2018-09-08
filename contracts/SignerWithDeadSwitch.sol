@@ -28,14 +28,13 @@ contract SignerWithDeadSwitch is SignerRole {
         finalizeAfter = 0;
     }
 
-    function cancelDeadSwitch(address _newRecoverer) public onlySigner {
+    // this cancels a pending dead switch
+    // NOTE: to be called by the contract itself!
+    function changeRecoverer(address _newRecoverer) public {
+        require(msg.sender == address(this));
         require(_newRecoverer != recoverer); // to avoid malicious initiateDeadSwitch() calls via sig replay
         recoverer = _newRecoverer;
         finalizeAfter = 0;
-    }
-
-    function setRecoverer(address _recoverer) public onlySigner {
-        recoverer = _recoverer;
     }
 
 }
