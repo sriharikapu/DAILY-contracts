@@ -1,1 +1,3 @@
 # daily-contracts
+
+truffle compile
